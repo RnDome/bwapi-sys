@@ -1,0 +1,10 @@
+[package]
+name = "bwapi-sys"
+version = "0.1.0"
+authors = ["Dmitry Kashitsyn <korvin@deeptown.org>", "Roman Proskuryakov <humbug@deeptown.org>"]
+keywords = ["starcraft", "broodwar", "api", "binding", "ffi"]
+repository = "https://github.com/RnDome/bwapi-sys"
+description = "FFI bindings to the bwapi-c library"
+license = "Unlicense/MIT"
+
+[dependencies]
