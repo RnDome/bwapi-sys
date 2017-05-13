@@ -5,11 +5,11 @@
 /// These are interface-only types with provided API
 ///  You should use them only by pointer
 pub struct Unit;
-pub struct UnitCommand;
 pub struct Player;
 pub struct Region;
 pub struct Force;
 pub struct Bullet;
+pub struct Game;
 /// These are value-only structs with no API
 ///  You should implement API on your own
 #[repr(C)]
@@ -26,6 +26,46 @@ pub struct Order {
     pub id: ::std::os::raw::c_int,
 }
 impl Clone for Order {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct Color {
+    pub color: ::std::os::raw::c_int,
+}
+impl Clone for Color {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct CoordinateType {
+    pub id: ::std::os::raw::c_int,
+}
+impl Clone for CoordinateType {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct MouseButton {
+    pub id: ::std::os::raw::c_int,
+}
+impl Clone for MouseButton {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct KeyButton {
+    pub id: ::std::os::raw::c_int,
+}
+impl Clone for KeyButton {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct Error {
+    pub id: ::std::os::raw::c_int,
+}
+impl Clone for Error {
     fn clone(&self) -> Self { *self }
 }
 #[repr(C)]
@@ -86,10 +126,10 @@ impl Clone for BulletType {
 }
 #[repr(C)]
 #[derive(Copy)]
-pub struct Color {
-    pub color: ::std::os::raw::c_int,
+pub struct GameType {
+    pub id: ::std::os::raw::c_int,
 }
-impl Clone for Color {
+impl Clone for GameType {
     fn clone(&self) -> Self { *self }
 }
 #[repr(C)]
@@ -110,12 +150,548 @@ pub struct TilePosition {
 impl Clone for TilePosition {
     fn clone(&self) -> Self { *self }
 }
-pub struct String;
+#[repr(C)]
+#[derive(Copy)]
+pub struct WalkPosition {
+    pub x: ::std::os::raw::c_int,
+    pub y: ::std::os::raw::c_int,
+}
+impl Clone for WalkPosition {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct UnitCommand {
+    pub unit: *mut Unit,
+    pub type_: UnitCommandType,
+    pub target: *mut Unit,
+    pub x: ::std::os::raw::c_int,
+    pub y: ::std::os::raw::c_int,
+    pub extra: ::std::os::raw::c_int,
+}
+impl Clone for UnitCommand {
+    fn clone(&self) -> Self { *self }
+}
+pub struct BwString;
+pub struct Iterator;
+pub struct UnitIterator;
+pub struct PlayerIterator;
+pub struct ForceIterator;
+pub struct BulletIterator;
+pub struct RegionIterator;
+extern "C" {
+    pub fn BwString_new(data: *const ::std::os::raw::c_char, len: usize)
+     -> *mut BwString;
+}
+extern "C" {
+    pub fn BwString_data(self_: *mut BwString) -> *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn BwString_len(self_: *mut BwString) -> usize;
+}
+extern "C" {
+    pub fn BwString_release(self_: *mut BwString);
+}
+extern "C" {
+    pub fn Iterator_valid(self_: *const Iterator) -> bool;
+}
+extern "C" {
+    pub fn Iterator_get(self_: *const Iterator)
+     -> *const ::std::os::raw::c_void;
+}
+extern "C" {
+    pub fn Iterator_next(self_: *mut Iterator);
+}
+extern "C" {
+    pub fn Iterator_release(self_: *mut Iterator);
+}
+extern "C" {
+    pub fn Game_getForces(self_: *mut Game) -> *mut ForceIterator;
+}
+extern "C" {
+    pub fn Game_getPlayers(self_: *mut Game) -> *mut PlayerIterator;
+}
+extern "C" {
+    pub fn Game_getAllUnits(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getMinerals(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getGeysers(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getNeutralUnits(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getStaticMinerals(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getStaticGeysers(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getStaticNeutralUnits(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getBullets(self_: *mut Game) -> *mut BulletIterator;
+}
+extern "C" {
+    pub fn Game_getForce(self_: *mut Game, forceID: ::std::os::raw::c_int)
+     -> *mut Force;
+}
+extern "C" {
+    pub fn Game_getPlayer(self_: *mut Game, playerID: ::std::os::raw::c_int)
+     -> *mut Player;
+}
+extern "C" {
+    pub fn Game_getUnit(self_: *mut Game, unitID: ::std::os::raw::c_int)
+     -> *mut Unit;
+}
+extern "C" {
+    pub fn Game_indexToUnit(self_: *mut Game,
+                            unitIndex: ::std::os::raw::c_int) -> *mut Unit;
+}
+extern "C" {
+    pub fn Game_getRegion(self_: *mut Game, regionID: ::std::os::raw::c_int)
+     -> *mut Region;
+}
+extern "C" {
+    pub fn Game_getGameType(self_: *mut Game) -> GameType;
+}
+extern "C" {
+    pub fn Game_getLatency(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getFrameCount(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getReplayFrameCount(self_: *mut Game)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getFPS(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getAverageFPS(self_: *mut Game) -> f64;
+}
+extern "C" {
+    pub fn Game_getMousePosition(self_: *mut Game) -> Position;
+}
+extern "C" {
+    pub fn Game_getMouseState(self_: *mut Game, button: MouseButton) -> bool;
+}
+extern "C" {
+    pub fn Game_getKeyState(self_: *mut Game, key: KeyButton) -> bool;
+}
+extern "C" {
+    pub fn Game_getScreenPosition(self_: *mut Game) -> Position;
+}
+extern "C" {
+    pub fn Game_setScreenPosition(self_: *mut Game, p: Position);
+}
+extern "C" {
+    pub fn Game_pingMinimap(self_: *mut Game, p: Position);
+}
+extern "C" {
+    pub fn Game_isFlagEnabled(self_: *mut Game, flag: ::std::os::raw::c_int)
+     -> bool;
+}
+extern "C" {
+    pub fn Game_enableFlag(self_: *mut Game, flag: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn Game_getLastError(self_: *mut Game) -> Error;
+}
+extern "C" {
+    pub fn Game_setLastError(self_: *mut Game, e: Error) -> bool;
+}
+extern "C" {
+    pub fn Game_mapWidth(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_mapHeight(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_mapFileName(self_: *mut Game) -> *mut BwString;
+}
+extern "C" {
+    pub fn Game_mapPathName(self_: *mut Game) -> *mut BwString;
+}
+extern "C" {
+    pub fn Game_mapName(self_: *mut Game) -> *mut BwString;
+}
+extern "C" {
+    pub fn Game_mapHash(self_: *mut Game) -> *mut BwString;
+}
+extern "C" {
+    pub fn Game_isWalkable(self_: *mut Game, position: WalkPosition) -> bool;
+}
+extern "C" {
+    pub fn Game_getGroundHeight(self_: *mut Game, position: TilePosition)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_isBuildable(self_: *mut Game, position: TilePosition,
+                            includeBuildings: bool) -> bool;
+}
+extern "C" {
+    pub fn Game_isVisible(self_: *mut Game, position: TilePosition) -> bool;
+}
+extern "C" {
+    pub fn Game_isExplored(self_: *mut Game, position: TilePosition) -> bool;
+}
+extern "C" {
+    pub fn Game_hasCreep(self_: *mut Game, position: TilePosition) -> bool;
+}
+extern "C" {
+    pub fn Game_hasPowerPrecise(self_: *mut Game, position: Position,
+                                unitType: UnitType) -> bool;
+}
+extern "C" {
+    pub fn Game_hasPower(self_: *mut Game, position: TilePosition,
+                         unitType: UnitType) -> bool;
+}
+extern "C" {
+    pub fn Game_hasPowerWH(self_: *mut Game, position: TilePosition,
+                           tileWidth: ::std::os::raw::c_int,
+                           tileHeight: ::std::os::raw::c_int,
+                           unitType: UnitType) -> bool;
+}
+extern "C" {
+    pub fn Game_canBuildHere(self_: *mut Game, position: TilePosition,
+                             type_: UnitType, builder: *mut Unit,
+                             checkExplored: bool) -> bool;
+}
+extern "C" {
+    pub fn Game_canMake(self_: *mut Game, type_: UnitType, builder: *mut Unit)
+     -> bool;
+}
+extern "C" {
+    pub fn Game_canResearch(self_: *mut Game, type_: TechType,
+                            unit: *mut Unit, checkCanIssueCommandType: bool)
+     -> bool;
+}
+extern "C" {
+    pub fn Game_canUpgrade(self_: *mut Game, type_: UpgradeType,
+                           unit: *mut Unit, checkCanIssueCommandType: bool)
+     -> bool;
+}
+extern "C" {
+    pub fn Game_printf(self_: *mut Game,
+                       format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_sendText(self_: *mut Game,
+                         format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_sendTextEx(self_: *mut Game, toAllies: bool,
+                           format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_isInGame(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_isMultiplayer(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_isBattleNet(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_isPaused(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_isReplay(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_pauseGame(self_: *mut Game);
+}
+extern "C" {
+    pub fn Game_resumeGame(self_: *mut Game);
+}
+extern "C" {
+    pub fn Game_leaveGame(self_: *mut Game);
+}
+extern "C" {
+    pub fn Game_restartGame(self_: *mut Game);
+}
+extern "C" {
+    pub fn Game_setLocalSpeed(self_: *mut Game, speed: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn Game_getSelectedUnits(self_: *mut Game) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_self(self_: *mut Game) -> *mut Player;
+}
+extern "C" {
+    pub fn Game_enemy(self_: *mut Game) -> *mut Player;
+}
+extern "C" {
+    pub fn Game_neutral(self_: *mut Game) -> *mut Player;
+}
+extern "C" {
+    pub fn Game_allies(self_: *mut Game) -> *mut PlayerIterator;
+}
+extern "C" {
+    pub fn Game_enemies(self_: *mut Game) -> *mut PlayerIterator;
+}
+extern "C" {
+    pub fn Game_observers(self_: *mut Game) -> *mut PlayerIterator;
+}
+extern "C" {
+    pub fn Game_drawText(self_: *mut Game, ctype: CoordinateType,
+                         x: ::std::os::raw::c_int, y: ::std::os::raw::c_int,
+                         format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_drawTextMap(self_: *mut Game, p: Position,
+                            format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_drawTextMouse(self_: *mut Game, p: Position,
+                              format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_drawTextScreen(self_: *mut Game, p: Position,
+                               format: *const ::std::os::raw::c_char, ...);
+}
+extern "C" {
+    pub fn Game_drawBox(self_: *mut Game, ctype: CoordinateType,
+                        left: ::std::os::raw::c_int,
+                        top: ::std::os::raw::c_int,
+                        right: ::std::os::raw::c_int,
+                        bottom: ::std::os::raw::c_int, color: Color,
+                        isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawBoxMap(self_: *mut Game, leftTop: Position,
+                           rightBottom: Position, color: Color,
+                           isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawBoxMouse(self_: *mut Game, leftTop: Position,
+                             rightBottom: Position, color: Color,
+                             isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawBoxScreen(self_: *mut Game, leftTop: Position,
+                              rightBottom: Position, color: Color,
+                              isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawTriangle(self_: *mut Game, ctype: CoordinateType,
+                             ax: ::std::os::raw::c_int,
+                             ay: ::std::os::raw::c_int,
+                             bx: ::std::os::raw::c_int,
+                             by: ::std::os::raw::c_int,
+                             cx: ::std::os::raw::c_int,
+                             cy: ::std::os::raw::c_int, color: Color,
+                             isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawTriangleMap(self_: *mut Game, a: Position, b: Position,
+                                c: Position, color: Color, isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawTriangleMouse(self_: *mut Game, a: Position, b: Position,
+                                  c: Position, color: Color, isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawTriangleScreen(self_: *mut Game, a: Position, b: Position,
+                                   c: Position, color: Color, isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawCircle(self_: *mut Game, ctype: CoordinateType,
+                           x: ::std::os::raw::c_int, y: ::std::os::raw::c_int,
+                           radius: ::std::os::raw::c_int, color: Color,
+                           isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawCircleMap(self_: *mut Game, p: Position,
+                              radius: ::std::os::raw::c_int, color: Color,
+                              isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawCircleMouse(self_: *mut Game, p: Position,
+                                radius: ::std::os::raw::c_int, color: Color,
+                                isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawCircleScreen(self_: *mut Game, p: Position,
+                                 radius: ::std::os::raw::c_int, color: Color,
+                                 isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawEllipse(self_: *mut Game, ctype: CoordinateType,
+                            x: ::std::os::raw::c_int,
+                            y: ::std::os::raw::c_int,
+                            xrad: ::std::os::raw::c_int,
+                            yrad: ::std::os::raw::c_int, color: Color,
+                            isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawEllipseMap(self_: *mut Game, p: Position,
+                               xrad: ::std::os::raw::c_int,
+                               yrad: ::std::os::raw::c_int, color: Color,
+                               isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawEllipseMouse(self_: *mut Game, p: Position,
+                                 xrad: ::std::os::raw::c_int,
+                                 yrad: ::std::os::raw::c_int, color: Color,
+                                 isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawEllipseScreen(self_: *mut Game, p: Position,
+                                  xrad: ::std::os::raw::c_int,
+                                  yrad: ::std::os::raw::c_int, color: Color,
+                                  isSolid: bool);
+}
+extern "C" {
+    pub fn Game_drawDot(self_: *mut Game, ctype: CoordinateType,
+                        x: ::std::os::raw::c_int, y: ::std::os::raw::c_int,
+                        color: Color);
+}
+extern "C" {
+    pub fn Game_drawDotMap(self_: *mut Game, p: Position, color: Color);
+}
+extern "C" {
+    pub fn Game_drawDotMouse(self_: *mut Game, p: Position, color: Color);
+}
+extern "C" {
+    pub fn Game_drawDotScreen(self_: *mut Game, p: Position, color: Color);
+}
+extern "C" {
+    pub fn Game_drawLine(self_: *mut Game, ctype: CoordinateType,
+                         x1: ::std::os::raw::c_int, y1: ::std::os::raw::c_int,
+                         x2: ::std::os::raw::c_int, y2: ::std::os::raw::c_int,
+                         color: Color);
+}
+extern "C" {
+    pub fn Game_drawLineMap(self_: *mut Game, a: Position, b: Position,
+                            color: Color);
+}
+extern "C" {
+    pub fn Game_drawLineMouse(self_: *mut Game, a: Position, b: Position,
+                              color: Color);
+}
+extern "C" {
+    pub fn Game_drawLineScreen(self_: *mut Game, a: Position, b: Position,
+                               color: Color);
+}
+extern "C" {
+    pub fn Game_getLatencyFrames(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getLatencyTime(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getRemainingLatencyFrames(self_: *mut Game)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getRemainingLatencyTime(self_: *mut Game)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getRevision(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getClientVersion(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_isDebug(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_isLatComEnabled(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_setLatCom(self_: *mut Game, isEnabled: bool);
+}
+extern "C" {
+    pub fn Game_isGUIEnabled(self_: *mut Game) -> bool;
+}
+extern "C" {
+    pub fn Game_setGUI(self_: *mut Game, enabled: bool);
+}
+extern "C" {
+    pub fn Game_getInstanceNumber(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getAPM(self_: *mut Game, includeSelects: bool)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_setMap(self_: *mut Game,
+                       mapFileName: *const ::std::os::raw::c_char) -> bool;
+}
+extern "C" {
+    pub fn Game_setFrameSkip(self_: *mut Game,
+                             frameSkip: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn Game_hasPath(self_: *mut Game, source: Position,
+                        destination: Position) -> bool;
+}
+extern "C" {
+    pub fn Game_setAlliance(self_: *mut Game, player: *mut Player,
+                            allied: bool, alliedVictory: bool) -> bool;
+}
+extern "C" {
+    pub fn Game_setVision(self_: *mut Game, player: *mut Player,
+                          enabled: bool) -> bool;
+}
+extern "C" {
+    pub fn Game_elapsedTime(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_setCommandOptimizationLevel(self_: *mut Game,
+                                            level: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn Game_countdownTimer(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getAllRegions(self_: *mut Game) -> *mut RegionIterator;
+}
+extern "C" {
+    pub fn Game_getRegionAt(self_: *mut Game, position: Position)
+     -> *mut Region;
+}
+extern "C" {
+    pub fn Game_getLastEventTime(self_: *mut Game) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_setRevealAll(self_: *mut Game, reveal: bool) -> bool;
+}
+extern "C" {
+    pub fn Game_getBuildLocation(self_: *mut Game, type_: UnitType,
+                                 desiredPosition: TilePosition,
+                                 maxRange: ::std::os::raw::c_int, creep: bool)
+     -> TilePosition;
+}
+extern "C" {
+    pub fn Game_getDamageFrom(self_: *mut Game, fromType: UnitType,
+                              toType: UnitType, fromPlayer: *mut Player,
+                              toPlayer: *mut Player) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getDamageTo(self_: *mut Game, toType: UnitType,
+                            fromType: UnitType, toPlayer: *mut Player,
+                            fromPlayer: *mut Player) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Game_getRandomSeed(self_: *mut Game) -> ::std::os::raw::c_uint;
+}
 extern "C" {
     pub fn Player_getID(self_: *mut Player) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn Player_getName(self_: *mut Player) -> *mut String;
+    pub fn Player_getName(self_: *mut Player) -> *mut BwString;
+}
+extern "C" {
+    pub fn Player_getUnits(self_: *mut Player) -> *mut UnitIterator;
 }
 extern "C" {
     pub fn Player_getRace(self_: *mut Player) -> Race;
@@ -295,6 +871,15 @@ extern "C" {
      -> bool;
 }
 extern "C" {
+    pub fn Force_getID(self_: *mut Force) -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Force_getName(self_: *mut Force) -> *mut BwString;
+}
+extern "C" {
+    pub fn Force_getPlayers(self_: *mut Force) -> *mut PlayerIterator;
+}
+extern "C" {
     pub fn Unit_getID(self_: *mut Unit) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -373,7 +958,7 @@ extern "C" {
      -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn Unit_getLastCommand(self_: *mut Unit) -> *mut UnitCommand;
+    pub fn Unit_getLastCommand(self_: *mut Unit) -> UnitCommand;
 }
 extern "C" {
     pub fn Unit_getLastAttackingPlayer(self_: *mut Unit) -> *mut Player;
@@ -522,13 +1107,22 @@ extern "C" {
     pub fn Unit_getTransport(self_: *mut Unit) -> *mut Unit;
 }
 extern "C" {
+    pub fn Unit_getLoadedUnits(self_: *mut Unit) -> *mut UnitIterator;
+}
+extern "C" {
     pub fn Unit_getSpaceRemaining(self_: *mut Unit) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn Unit_getCarrier(self_: *mut Unit) -> *mut Unit;
 }
 extern "C" {
+    pub fn Unit_getInterceptors(self_: *mut Unit) -> *mut UnitIterator;
+}
+extern "C" {
     pub fn Unit_getHatchery(self_: *mut Unit) -> *mut Unit;
+}
+extern "C" {
+    pub fn Unit_getLarva(self_: *mut Unit) -> *mut UnitIterator;
 }
 extern "C" {
     pub fn Unit_hasNuke(self_: *mut Unit) -> bool;
@@ -696,7 +1290,7 @@ extern "C" {
     pub fn Unit_isTargetable(self_: *mut Unit) -> bool;
 }
 extern "C" {
-    pub fn Unit_issueCommand(self_: *mut Unit) -> bool;
+    pub fn Unit_issueCommand(self_: *mut Unit, command: UnitCommand) -> bool;
 }
 extern "C" {
     pub fn Unit_attack_Position(self_: *mut Unit, target: Position,
@@ -844,7 +1438,7 @@ extern "C" {
     pub fn Unit_placeCOP(self_: *mut Unit, target: TilePosition) -> bool;
 }
 extern "C" {
-    pub fn Unit_canIssueCommand(self_: *mut Unit, command: *mut UnitCommand,
+    pub fn Unit_canIssueCommand(self_: *mut Unit, command: UnitCommand,
                                 checkCanUseTechPositionOnPositions: bool,
                                 checkCanUseTechUnitOnUnits: bool,
                                 checkCanBuildUnitType: bool,
@@ -853,8 +1447,7 @@ extern "C" {
                                 checkCommandibility: bool) -> bool;
 }
 extern "C" {
-    pub fn Unit_canIssueCommandGrouped(self_: *mut Unit,
-                                       command: *mut UnitCommand,
+    pub fn Unit_canIssueCommandGrouped(self_: *mut Unit, command: UnitCommand,
                                        checkCanUseTechPositionOnPositions:
                                            bool,
                                        checkCanUseTechUnitOnUnits: bool,
@@ -1270,6 +1863,12 @@ extern "C" {
                                    checkCommandibility: bool) -> bool;
 }
 extern "C" {
+    pub fn Unit_canCancelTrainSlot_Check(self_: *mut Unit,
+                                         slot: ::std::os::raw::c_int,
+                                         checkCanIssueCommandType: bool,
+                                         checkCommandibility: bool) -> bool;
+}
+extern "C" {
     pub fn Unit_canCancelMorph(self_: *mut Unit, checkCommandibility: bool)
      -> bool;
 }
@@ -1341,7 +1940,8 @@ extern "C" {
      -> bool;
 }
 extern "C" {
-    pub fn Unit_canPlaceCOP(checkCommandibility: bool) -> bool;
+    pub fn Unit_canPlaceCOP(self_: *mut Unit, checkCommandibility: bool)
+     -> bool;
 }
 extern "C" {
     pub fn Unit_canPlaceCOP_TilePosition(self_: *mut Unit,
@@ -1409,6 +2009,9 @@ extern "C" {
     pub fn Region_isAccessible(self_: *mut Region) -> bool;
 }
 extern "C" {
+    pub fn Region_getNeighbors(self_: *mut Region) -> *mut RegionIterator;
+}
+extern "C" {
     pub fn Region_getBoundsLeft(self_: *mut Region) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -1433,16 +2036,82 @@ extern "C" {
     pub fn Region_getDistance(self_: *mut Region, other: *mut Region)
      -> ::std::os::raw::c_int;
 }
-extern "C" {
-    pub fn String_new(data: *const ::std::os::raw::c_char, len: usize)
-     -> *mut String;
+#[repr(C)]
+#[derive(Copy)]
+pub struct AIModule {
+    pub onStart: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                *mut AIModule)>,
+    pub onEnd: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                              *mut AIModule,
+                                                          isWinner: bool)>,
+    pub onFrame: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                *mut AIModule)>,
+    pub onSendText: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                   *mut AIModule,
+                                                               text:
+                                                                   *const ::std::os::raw::c_char)>,
+    pub onReceiveText: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                      *mut AIModule,
+                                                                  player:
+                                                                      *mut Player,
+                                                                  text:
+                                                                      *const ::std::os::raw::c_char)>,
+    pub onPlayerLeft: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                     *mut AIModule,
+                                                                 player:
+                                                                     *mut Player)>,
+    pub onNukeDetect: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                     *mut AIModule,
+                                                                 target:
+                                                                     Position)>,
+    pub onUnitDiscover: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                       *mut AIModule,
+                                                                   unit:
+                                                                       *mut Unit)>,
+    pub onUnitEvade: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                    *mut AIModule,
+                                                                unit:
+                                                                    *mut Unit)>,
+    pub onUnitShow: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                   *mut AIModule,
+                                                               unit:
+                                                                   *mut Unit)>,
+    pub onUnitHide: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                   *mut AIModule,
+                                                               unit:
+                                                                   *mut Unit)>,
+    pub onUnitCreate: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                     *mut AIModule,
+                                                                 unit:
+                                                                     *mut Unit)>,
+    pub onUnitDestroy: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                      *mut AIModule,
+                                                                  unit:
+                                                                      *mut Unit)>,
+    pub onUnitMorph: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                    *mut AIModule,
+                                                                unit:
+                                                                    *mut Unit)>,
+    pub onUnitRenegade: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                       *mut AIModule,
+                                                                   unit:
+                                                                       *mut Unit)>,
+    pub onSaveGame: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                   *mut AIModule,
+                                                               gameName:
+                                                                   *const ::std::os::raw::c_char)>,
+    pub onUnitComplete: ::std::option::Option<unsafe extern "C" fn(self_:
+                                                                       *mut AIModule,
+                                                                   unit:
+                                                                       *mut Unit)>,
+}
+impl Clone for AIModule {
+    fn clone(&self) -> Self { *self }
 }
 extern "C" {
-    pub fn String_data(self_: *const String) -> *const ::std::os::raw::c_char;
+    pub fn createAIModuleWrapper(module: AIModule)
+     -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
-    pub fn String_len(self_: *const String) -> usize;
-}
-extern "C" {
-    pub fn String_release(self_: *mut String);
+    pub fn destroyAIModuleWrapper(module: *mut ::std::os::raw::c_void);
 }
