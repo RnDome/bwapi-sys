@@ -197,7 +197,7 @@ extern "C" {
 }
 extern "C" {
     pub fn Iterator_get(self_: *const Iterator)
-     -> *const ::std::os::raw::c_void;
+     -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
     pub fn Iterator_next(self_: *mut Iterator);
