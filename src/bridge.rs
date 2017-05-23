@@ -2117,7 +2117,7 @@ impl Clone for AIModule {
     fn clone(&self) -> Self { *self }
 }
 extern "C" {
-    pub fn createAIModuleWrapper(module: *mut AIModule, module_size: usize)
+    pub fn createAIModuleWrapper(module: *mut AIModule)
      -> *mut ::std::os::raw::c_void;
 }
 extern "C" {
