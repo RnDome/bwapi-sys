@@ -5,7 +5,7 @@ extern crate tar;
 
 use std::env;
 use std::path::{Path, PathBuf};
-use std::io::{Read, Write, BufWriter};
+use std::io::{Write, BufWriter};
 use std::fs::{self, File, DirBuilder};
 
 use curl::easy::Easy;
@@ -64,7 +64,6 @@ fn main() {
         "0.1.0", "Debug");
     log_var!(binary_url);
     let short_file_name = binary_url.split("/").last().unwrap();
-    let mut base_name = short_file_name.to_string();
 
     let download_dir = PathBuf::from(&get!("CARGO_MANIFEST_DIR"))
         .join("target")
@@ -84,6 +83,7 @@ fn main() {
 
     log!("Obtaining BWAPI-C distribution...");
     download(&binary_url, &zip_path);
+    println!("cargo:rerun-if-changed={}", zip_path.display());
 
     log!("Unpacking archive...");
     extract(&zip_path, &unpacked_dir);
