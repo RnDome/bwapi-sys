@@ -8,3 +8,8 @@ description = "FFI bindings to the bwapi-c library"
 license = "Unlicense/MIT"
 
 [dependencies]
+
+[build-dependencies]
+reqwest = "0.6"
+error-chain = "0.10"
+zip = "0.2"
