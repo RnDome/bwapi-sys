@@ -1,96 +1,93 @@
-extern crate reqwest;
 #[macro_use] extern crate error_chain;
-extern crate zip;
+extern crate curl;
+extern crate flate2;
+extern crate tar;
 
 use std::env;
 use std::path::{Path, PathBuf};
-use std::io::Read;
+use std::io::{Read, Write, BufWriter};
 use std::fs::{self, File, DirBuilder};
 
+use curl::easy::Easy;
+use flate2::read::GzDecoder;
+use tar::Archive;
 
-error_chain! {
-    foreign_links {
-        ReqError(reqwest::Error);
-        IoError(std::io::Error);
-        ZipError(zip::result::ZipError);
-    }
+macro_rules! get(($name:expr) => (ok!(env::var($name))));
+macro_rules! ok(($expression:expr) => ($expression.unwrap()));
+macro_rules! log {
+    ($fmt:expr) => (println!(concat!("bwapi-sys/build.rs:{}: ", $fmt), line!()));
+    ($fmt:expr, $($arg:tt)*) => (println!(concat!("bwapi-sys/build.rs:{}: ", $fmt),
+    line!(), $($arg)*));
 }
+macro_rules! log_var(($var:ident) => (log!(concat!(stringify!($var), " = {:?}"), $var)));
 
-/*fn main() {
-    let bwapic_dir = env::var("BWAPIC_DIR").expect("Environment variable BWAPIC_DIR");
-    //.unwrap_or("/home/korvin/work/research/bw/bwapi-sys/");
-    println!("cargo:rustc-link-search={}", bwapic_dir);
-    println!("cargo:rustc-link-lib=BWAPIC");
-}*/
-
-fn run() -> Result<()> {
-    let architecture = "i686-pc-windows-gnu"; // TODO read from cargo env
-    let zip_filename = "bwapi-c-0.1.0-Release-win32.zip"; // TODO read from config
-    let build_mode   = "debug"; // TODO read from env
-    
-    let mut zip_path = PathBuf::from("./bwapi-c");
-    // zip_path.push(architecture);
-    // zip_path.push(build_mode);
-    // zip_path.push("native");
-
-    if !zip_path.exists() {
-        println!("Creating download directory  {:?}", zip_path);
-        DirBuilder::new().recursive(true).create(&zip_path)?;
-    }
-
-    zip_path.push(zip_filename);
-
-    if zip_path.exists() {
-        println!("Archive was already downloaded");
+fn download(url: &str, into: &Path) {
+    if into.exists() {
+        log!("File {} was already downloaded", into.display());
     } else {
-        println!("Obtaining BWAPI-C distribution...");
-        {
-            let download_url  = String::from("https://github.com/RnDome/bwapi-c/releases/download/v0.1.0/") + zip_filename;
-            let mut response = reqwest::get(&download_url)?;
+        let f = File::create(&into).unwrap();
+        let mut writer = BufWriter::new(f);
+        let mut easy = Easy::new();
+        easy.url(&url).unwrap();
+        easy.follow_location(true).unwrap();
 
-            println!("Status: {}", response.status());
-            println!("Headers:\n{}", response.headers());
+        easy.write_function(move |data| {
+            Ok(writer.write(data).unwrap())
+        }).unwrap();
+        easy.perform().unwrap();
 
-            println!("Downloading to {:?}", &zip_path);
-            let mut file = File::create(&zip_path)?;
-            std::io::copy(&mut response, &mut file)?;
+        let response_code = easy.response_code().unwrap();
+        match response_code {
+            200 | 302 => { }
+            //302 => { }
+            _ => {
+                fs::remove_file(&into).unwrap();
+                panic!("Unexpected response code {} for {}", response_code, url);
+            }
         }
     }
-
-    println!("Unpacking archive...");
-    {
-        let file = File::open(&zip_path)?;
-        let mut zip = zip::ZipArchive::new(file)?;
-        println!("Archive contains {} entries", zip.len());
-
-        for i in 0 .. zip.len()
-        {
-            let mut archived_file = zip.by_index(i)?;
-
-            let mut unpacked_file = {
-                let archived_file_name = PathBuf::from(archived_file.name());
-                println!("Unpacking from {} ...", archived_file.name());
-
-                let mut unpacked_path = zip_path.clone();
-                unpacked_path.pop();
-                let unpacked_path = unpacked_path.join(archived_file_name);
-
-                println!("Unpacking to {:?} ...", unpacked_path);
-
-                if unpacked_path.is_dir() {
-                    DirBuilder::new().recursive(true).create(unpacked_path)?;
-                    continue;
-                } else {
-                    File::create(&unpacked_path)?
-                }
-            };
-
-            std::io::copy(&mut archived_file, &mut unpacked_file)?;
-        }
-    }
-
-    println!("Done.");
-    Ok(())
 }
 
-quick_main!(run);
+fn extract(archive_path: &Path, extract_to: &Path) {
+    let file = File::open(archive_path).unwrap();
+    let unzipped = GzDecoder::new(file).unwrap();
+    let mut archive = Archive::new(unzipped);
+    archive.unpack(extract_to).unwrap();
+}
+
+fn main() {
+    let architecture = "i686-pc-windows-gnu"; // TODO read from cargo env
+    let build_mode   = "debug"; // TODO read from env
+
+    let binary_url = format!(
+        "https://github.com/RnDome/bwapi-c/releases/download/v{}/bwapi-c-{}-win32.tar.gz",
+        "0.1.0", "Debug");
+    log_var!(binary_url);
+    let short_file_name = binary_url.split("/").last().unwrap();
+    let mut base_name = short_file_name.to_string();
+
+    let download_dir = PathBuf::from(&get!("CARGO_MANIFEST_DIR"))
+        .join("target")
+        .join(&build_mode)
+        .join("native")
+        .join(&architecture);
+
+    if !download_dir.exists() {
+        DirBuilder::new().recursive(true).create(&download_dir).unwrap();
+    }
+
+    let zip_path = download_dir.join(short_file_name);
+    log_var!(zip_path);
+
+    let unpacked_dir = download_dir.join(format!("bwapi-c-{}-win32", "Debug"));
+    log_var!(unpacked_dir);
+
+    log!("Obtaining BWAPI-C distribution...");
+    download(&binary_url, &zip_path);
+
+    log!("Unpacking archive...");
+    extract(&zip_path, &unpacked_dir);
+
+    println!("cargo:rustc-link-search={}", unpacked_dir.display());
+    println!("cargo:rustc-link-lib=BWAPIC");
+}

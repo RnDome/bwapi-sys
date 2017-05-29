@@ -10,6 +10,7 @@ license = "Unlicense/MIT"
 [dependencies]
 
 [build-dependencies]
-reqwest = "0.6"
 error-chain = "0.10"
-zip = "0.2"
+curl = "0.4"
+flate2 = "0.2"
+tar = "0.4"
