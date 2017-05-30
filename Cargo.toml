@@ -10,7 +10,6 @@ license = "Unlicense/MIT"
 [dependencies]
 
 [build-dependencies]
-error-chain = "0.10"
 curl = "0.4"
 flate2 = "0.2"
 tar = "0.4"

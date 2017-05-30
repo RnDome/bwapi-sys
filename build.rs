@@ -1,4 +1,3 @@
-#[macro_use] extern crate error_chain;
 extern crate curl;
 extern crate flate2;
 extern crate tar;
@@ -39,7 +38,6 @@ fn download(url: &str, into: &Path) {
         let response_code = easy.response_code().unwrap();
         match response_code {
             200 | 302 => { }
-            //302 => { }
             _ => {
                 fs::remove_file(&into).unwrap();
                 panic!("Unexpected response code {} for {}", response_code, url);
