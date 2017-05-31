@@ -1,13 +1,11 @@
-extern crate curl;
+extern crate reqwest;
 extern crate flate2;
 extern crate tar;
 
 use std::env;
 use std::path::{Path, PathBuf};
-use std::io::{Write, BufWriter};
-use std::fs::{self, File, DirBuilder};
+use std::fs::{File, DirBuilder};
 
-use curl::easy::Easy;
 use flate2::read::GzDecoder;
 use tar::Archive;
 
@@ -24,25 +22,18 @@ fn download(url: &str, into: &Path) {
     if into.exists() {
         log!("File {} was already downloaded", into.display());
     } else {
-        let f = File::create(&into).unwrap();
-        let mut writer = BufWriter::new(f);
-        let mut easy = Easy::new();
-        easy.url(&url).unwrap();
-        easy.follow_location(true).unwrap();
+        log!("Downloading to {:?}", &into);
 
-        easy.write_function(move |data| {
-            Ok(writer.write(data).unwrap())
-        }).unwrap();
-        easy.perform().unwrap();
+        let mut response = reqwest::get(url).unwrap();
 
-        let response_code = easy.response_code().unwrap();
-        match response_code {
-            200 | 302 => { }
-            _ => {
-                fs::remove_file(&into).unwrap();
-                panic!("Unexpected response code {} for {}", response_code, url);
-            }
+        if !response.status().is_success() {
+            log!("Status: {}", response.status());
+            log!("Headers:\n{}", response.headers());
+            panic!("Could not download file");
         }
+
+        let mut file = File::create(&into).unwrap();
+        std::io::copy(&mut response, &mut file).unwrap();
     }
 }
 

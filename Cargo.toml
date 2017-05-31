@@ -10,6 +10,6 @@ license = "Unlicense/MIT"
 [dependencies]
 
 [build-dependencies]
-curl = "0.4"
+reqwest = "0.6"
 flate2 = "0.2"
 tar = "0.4"
