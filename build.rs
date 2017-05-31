@@ -65,9 +65,9 @@ fn main() {
 
     let download_dir = PathBuf::from(&get!("CARGO_MANIFEST_DIR"))
         .join("target")
+        .join(&architecture)
         .join(&build_mode)
-        .join("native")
-        .join(&architecture);
+        .join("native");
 
     if !download_dir.exists() {
         DirBuilder::new().recursive(true).create(&download_dir).unwrap();
@@ -86,6 +86,6 @@ fn main() {
     log!("Unpacking archive...");
     extract(&zip_path, &unpacked_dir);
 
-    println!("cargo:rustc-link-search={}", unpacked_dir.display());
+    println!("cargo:rustc-link-search={}", unpacked_dir.join("lib").display());
     println!("cargo:rustc-link-lib=BWAPIC");
 }
