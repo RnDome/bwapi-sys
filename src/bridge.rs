@@ -179,15 +179,22 @@ pub struct PlayerIterator;
 pub struct ForceIterator;
 pub struct BulletIterator;
 pub struct RegionIterator;
+pub type UnaryUnitFilter =
+    ::std::option::Option<unsafe extern "C" fn(unit: *mut Unit) -> bool>;
+pub type BestUnitFilter =
+    ::std::option::Option<unsafe extern "C" fn(left: *mut Unit,
+                                               right: *mut Unit)
+                              -> *mut Unit>;
 extern "C" {
-    pub fn BwString_new(data: *const ::std::os::raw::c_char, len: usize)
-     -> *mut BwString;
+    pub fn BwString_new(data: *const ::std::os::raw::c_char,
+                        len: ::std::os::raw::c_int) -> *mut BwString;
 }
 extern "C" {
-    pub fn BwString_data(self_: *mut BwString) -> *mut ::std::os::raw::c_char;
+    pub fn BwString_data(self_: *const BwString)
+     -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    pub fn BwString_len(self_: *mut BwString) -> usize;
+    pub fn BwString_len(self_: *const BwString) -> ::std::os::raw::c_int;
 }
 extern "C" {
     pub fn BwString_release(self_: *mut BwString);
@@ -204,6 +211,13 @@ extern "C" {
 }
 extern "C" {
     pub fn Iterator_release(self_: *mut Iterator);
+}
+extern "C" {
+    /// BWAPIC_setGame must be called from gameInit to initialize BWAPI::BroodwarPtr
+    pub fn BWAPIC_setGame(game: *mut Game);
+}
+extern "C" {
+    pub fn BWAPIC_getGame() -> *mut Game;
 }
 extern "C" {
     pub fn Game_getForces(self_: *mut Game) -> *mut ForceIterator;
@@ -298,6 +312,40 @@ extern "C" {
 }
 extern "C" {
     pub fn Game_enableFlag(self_: *mut Game, flag: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn Game_getUnitsOnTile(self_: *mut Game, tile: TilePosition,
+                               pred: UnaryUnitFilter) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getUnitsInRectangle(self_: *mut Game, topLeft: Position,
+                                    bottomRight: Position,
+                                    pred: UnaryUnitFilter)
+     -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getUnitsInRadius(self_: *mut Game, center: Position,
+                                 radius: ::std::os::raw::c_int,
+                                 pred: UnaryUnitFilter) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Game_getClosestUnit(self_: *mut Game, center: Position,
+                               pred: UnaryUnitFilter,
+                               radius: ::std::os::raw::c_int) -> *mut Unit;
+}
+extern "C" {
+    pub fn Game_getClosestUnitInRectangle(self_: *mut Game, center: Position,
+                                          pred: UnaryUnitFilter,
+                                          left: ::std::os::raw::c_int,
+                                          top: ::std::os::raw::c_int,
+                                          right: ::std::os::raw::c_int,
+                                          bottom: ::std::os::raw::c_int)
+     -> *mut Unit;
+}
+extern "C" {
+    pub fn Game_getBestUnit(self_: *mut Game, best: BestUnitFilter,
+                            pred: UnaryUnitFilter, center: Position,
+                            radius: ::std::os::raw::c_int) -> *mut Unit;
 }
 extern "C" {
     pub fn Game_getLastError(self_: *mut Game) -> Error;
@@ -683,6 +731,26 @@ extern "C" {
 }
 extern "C" {
     pub fn Game_getRandomSeed(self_: *mut Game) -> ::std::os::raw::c_uint;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Client {
+    _unused: [u8; 0],
+}
+extern "C" {
+    pub fn BWAPIC_getClient() -> *mut Client;
+}
+extern "C" {
+    pub fn Client_isConnected(self_: *mut Client) -> bool;
+}
+extern "C" {
+    pub fn Client_connect(self_: *mut Client) -> bool;
+}
+extern "C" {
+    pub fn Client_disconnect(self_: *mut Client);
+}
+extern "C" {
+    pub fn Client_update(self_: *mut Client);
 }
 extern "C" {
     pub fn Player_getID(self_: *mut Player) -> ::std::os::raw::c_int;
@@ -1123,6 +1191,20 @@ extern "C" {
 }
 extern "C" {
     pub fn Unit_getLarva(self_: *mut Unit) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Unit_getUnitsInRadius(self_: *mut Unit,
+                                 radius: ::std::os::raw::c_int,
+                                 pred: UnaryUnitFilter) -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Unit_getUnitsInWeaponRange(self_: *mut Unit, weapon: WeaponType,
+                                      pred: UnaryUnitFilter)
+     -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Unit_getClosestUnit(self_: *mut Unit, pred: UnaryUnitFilter,
+                               radius: ::std::os::raw::c_int) -> *mut Unit;
 }
 extern "C" {
     pub fn Unit_hasNuke(self_: *mut Unit) -> bool;
@@ -2035,6 +2117,10 @@ extern "C" {
 extern "C" {
     pub fn Region_getDistance(self_: *mut Region, other: *mut Region)
      -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn Region_getUnits(self_: *mut Region, pred: UnaryUnitFilter)
+     -> *mut UnitIterator;
 }
 #[repr(C)]
 #[derive(Copy)]

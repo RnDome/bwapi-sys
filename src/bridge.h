@@ -7,6 +7,7 @@
 #include <Iterator.h>
 
 #include <Game.h>
+#include <Client.h>
 #include <Player.h>
 #include <Force.h>
 #include <Unit.h>
