@@ -50,7 +50,7 @@ fn main() {
 
     let binary_url = format!(
         "https://github.com/RnDome/bwapi-c/releases/download/v{}/bwapi-c-{}-win32.tar.gz",
-        "0.2.0", "Debug");
+        "0.3.0", "Debug");
     log_var!(binary_url);
     let short_file_name = binary_url.split("/").last().unwrap();
 

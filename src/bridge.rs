@@ -10,6 +10,7 @@ pub struct Region;
 pub struct Force;
 pub struct Bullet;
 pub struct Game;
+pub struct Client;
 /// These are value-only structs with no API
 ///  You should implement API on your own
 #[repr(C)]
@@ -173,12 +174,37 @@ impl Clone for UnitCommand {
     fn clone(&self) -> Self { *self }
 }
 pub struct BwString;
+#[repr(C)]
+#[derive(Copy)]
+pub struct EventType {
+    pub id: ::std::os::raw::c_int,
+}
+impl Clone for EventType {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
+pub struct Event {
+    pub position: Position,
+    pub text: *mut ::std::os::raw::c_void,
+    pub unit: *mut Unit,
+    pub player: *mut Player,
+    pub type_: EventType,
+    pub winner: bool,
+}
+impl Clone for Event {
+    fn clone(&self) -> Self { *self }
+}
 pub struct Iterator;
 pub struct UnitIterator;
 pub struct PlayerIterator;
 pub struct ForceIterator;
 pub struct BulletIterator;
 pub struct RegionIterator;
+pub struct PositionIterator;
+pub struct TilePositionIterator;
+pub struct EventIterator;
+pub struct UnitTypeIterator;
 pub type UnaryUnitFilter =
     ::std::option::Option<unsafe extern "C" fn(unit: *mut Unit) -> bool>;
 pub type BestUnitFilter =
@@ -248,6 +274,12 @@ extern "C" {
 }
 extern "C" {
     pub fn Game_getBullets(self_: *mut Game) -> *mut BulletIterator;
+}
+extern "C" {
+    pub fn Game_getNukeDots(self_: *mut Game) -> *mut PositionIterator;
+}
+extern "C" {
+    pub fn Game_getEvents(self_: *mut Game) -> *mut EventIterator;
 }
 extern "C" {
     pub fn Game_getForce(self_: *mut Game, forceID: ::std::os::raw::c_int)
@@ -423,6 +455,10 @@ extern "C" {
     pub fn Game_canUpgrade(self_: *mut Game, type_: UpgradeType,
                            unit: *mut Unit, checkCanIssueCommandType: bool)
      -> bool;
+}
+extern "C" {
+    pub fn Game_getStartLocations(self_: *mut Game)
+     -> *mut TilePositionIterator;
 }
 extern "C" {
     pub fn Game_printf(self_: *mut Game,
@@ -731,11 +767,6 @@ extern "C" {
 }
 extern "C" {
     pub fn Game_getRandomSeed(self_: *mut Game) -> ::std::os::raw::c_uint;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct Client {
-    _unused: [u8; 0],
 }
 extern "C" {
     pub fn BWAPIC_getClient() -> *mut Client;
@@ -1112,6 +1143,9 @@ extern "C" {
 }
 extern "C" {
     pub fn Unit_getBuildType(self_: *mut Unit) -> UnitType;
+}
+extern "C" {
+    pub fn Unit_getTrainingQueue(self_: *mut Unit) -> *mut UnitTypeIterator;
 }
 extern "C" {
     pub fn Unit_getTech(self_: *mut Unit) -> TechType;
