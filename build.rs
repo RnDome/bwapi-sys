@@ -4,7 +4,7 @@ extern crate tar;
 
 use std::env;
 use std::path::{Path, PathBuf};
-use std::fs::{File, DirBuilder};
+use std::fs::File;
 
 use flate2::read::GzDecoder;
 use tar::Archive;
@@ -45,38 +45,34 @@ fn extract(archive_path: &Path, extract_to: &Path) {
 }
 
 fn main() {
-    let architecture = "i686-pc-windows-gnu"; // TODO read from cargo env
-    let build_mode   = "debug"; // TODO read from env
+    let output_dir   = PathBuf::from(&get!("OUT_DIR"));
+    let target       = &get!("TARGET");
+    let build_mode   = &get!("PROFILE");
+
+    log_var!(output_dir);
+    log_var!(target);
+    log_var!(build_mode);
+
+    if !target.contains("i686-pc-windows-gnu") {
+        panic!("Only --target=i686-pc-windows-gnu is supported");
+    }
 
     let binary_url = format!(
-        "https://github.com/RnDome/bwapi-c/releases/download/v{}/bwapi-c-{}-win32.tar.gz",
-        "0.3.0", "Debug");
+        "https://github.com/RnDome/bwapi-c/releases/download/v{version}/bwapi-c-{mode}-win32.tar.gz",
+        version="0.3.0", mode=&build_mode);
     log_var!(binary_url);
     let short_file_name = binary_url.split("/").last().unwrap();
 
-    let download_dir = PathBuf::from(&get!("CARGO_MANIFEST_DIR"))
-        .join("target")
-        .join(&architecture)
-        .join(&build_mode)
-        .join("native");
-
-    if !download_dir.exists() {
-        DirBuilder::new().recursive(true).create(&download_dir).unwrap();
-    }
-
-    let zip_path = download_dir.join(short_file_name);
+    let zip_path = output_dir.join(short_file_name);
     log_var!(zip_path);
-
-    let unpacked_dir = download_dir.join(format!("bwapi-c-{}-win32", "Debug"));
-    log_var!(unpacked_dir);
 
     log!("Obtaining BWAPI-C distribution...");
     download(&binary_url, &zip_path);
-    println!("cargo:rerun-if-changed={}", zip_path.display());
 
     log!("Unpacking archive...");
-    extract(&zip_path, &unpacked_dir);
+    extract(&zip_path, &output_dir);
 
-    println!("cargo:rustc-link-search={}", unpacked_dir.join("lib").display());
-    println!("cargo:rustc-link-lib=BWAPIC");
+    println!("cargo:rerun-if-changed={}", output_dir.display());
+    println!("cargo:rustc-link-search=native={}", output_dir.join("lib").display());
+    println!("cargo:rustc-link-lib=static=BWAPIC");
 }
