@@ -6,8 +6,8 @@ keywords = ["starcraft", "broodwar", "api", "binding", "ffi"]
 repository = "https://github.com/RnDome/bwapi-sys"
 description = "FFI bindings to the bwapi-c library"
 license = "Unlicense/MIT"
-
-[dependencies]
+links = "BWAPIC"
+build = "build.rs"
 
 [build-dependencies]
 reqwest = "0.6"
