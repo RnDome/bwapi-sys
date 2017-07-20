@@ -39,6 +39,14 @@ impl Clone for Color {
 }
 #[repr(C)]
 #[derive(Copy)]
+pub struct TextSize {
+    pub size: ::std::os::raw::c_int,
+}
+impl Clone for TextSize {
+    fn clone(&self) -> Self { *self }
+}
+#[repr(C)]
+#[derive(Copy)]
 pub struct CoordinateType {
     pub id: ::std::os::raw::c_int,
 }
@@ -503,6 +511,10 @@ extern "C" {
     pub fn Game_setLocalSpeed(self_: *mut Game, speed: ::std::os::raw::c_int);
 }
 extern "C" {
+    pub fn Game_issueCommand(self_: *mut Game, units: *mut UnitIterator,
+                             command: UnitCommand) -> bool;
+}
+extern "C" {
     pub fn Game_getSelectedUnits(self_: *mut Game) -> *mut UnitIterator;
 }
 extern "C" {
@@ -522,6 +534,9 @@ extern "C" {
 }
 extern "C" {
     pub fn Game_observers(self_: *mut Game) -> *mut PlayerIterator;
+}
+extern "C" {
+    pub fn Game_setTextSize(self_: *mut Game, size: TextSize);
 }
 extern "C" {
     pub fn Game_drawText(self_: *mut Game, ctype: CoordinateType,
@@ -769,6 +784,18 @@ extern "C" {
     pub fn Game_getRandomSeed(self_: *mut Game) -> ::std::os::raw::c_uint;
 }
 extern "C" {
+    pub fn Game_registerEvent(self_: *mut Game,
+                              action:
+                                  ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                 *mut Game)>,
+                              condition:
+                                  ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                 *mut Game)
+                                                            -> bool>,
+                              timesToRun: ::std::os::raw::c_int,
+                              framesToCheck: ::std::os::raw::c_int);
+}
+extern "C" {
     pub fn BWAPIC_getClient() -> *mut Client;
 }
 extern "C" {
@@ -968,6 +995,18 @@ extern "C" {
     pub fn Player_hasUnitTypeRequirement(self_: *mut Player, unit: UnitType,
                                          amount: ::std::os::raw::c_int)
      -> bool;
+}
+extern "C" {
+    pub fn Player_registerEvent(self_: *mut Player,
+                                action:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Player)>,
+                                condition:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Player)
+                                                              -> bool>,
+                                timesToRun: ::std::os::raw::c_int,
+                                framesToCheck: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn Force_getID(self_: *mut Force) -> ::std::os::raw::c_int;
@@ -2066,6 +2105,18 @@ extern "C" {
                                          checkCommandibility: bool) -> bool;
 }
 extern "C" {
+    pub fn Unit_registerEvent(self_: *mut Unit,
+                              action:
+                                  ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                 *mut Unit)>,
+                              condition:
+                                  ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                 *mut Unit)
+                                                            -> bool>,
+                              timesToRun: ::std::os::raw::c_int,
+                              framesToCheck: ::std::os::raw::c_int);
+}
+extern "C" {
     pub fn Bullet_getID(self_: *mut Bullet) -> ::std::os::raw::c_int;
 }
 extern "C" {
@@ -2103,6 +2154,18 @@ extern "C" {
 }
 extern "C" {
     pub fn Bullet_isVisible(self_: *mut Bullet, player: *mut Player) -> bool;
+}
+extern "C" {
+    pub fn Bullet_registerEvent(self_: *mut Bullet,
+                                action:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Bullet)>,
+                                condition:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Bullet)
+                                                              -> bool>,
+                                timesToRun: ::std::os::raw::c_int,
+                                framesToCheck: ::std::os::raw::c_int);
 }
 extern "C" {
     pub fn Region_getID(self_: *mut Region) -> ::std::os::raw::c_int;
@@ -2155,6 +2218,18 @@ extern "C" {
 extern "C" {
     pub fn Region_getUnits(self_: *mut Region, pred: UnaryUnitFilter)
      -> *mut UnitIterator;
+}
+extern "C" {
+    pub fn Region_registerEvent(self_: *mut Region,
+                                action:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Region)>,
+                                condition:
+                                    ::std::option::Option<unsafe extern "C" fn(arg1:
+                                                                                   *mut Region)
+                                                              -> bool>,
+                                timesToRun: ::std::os::raw::c_int,
+                                framesToCheck: ::std::os::raw::c_int);
 }
 #[repr(C)]
 #[derive(Copy)]
