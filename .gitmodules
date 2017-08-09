@@ -1,0 +1,6 @@
+[submodule "openbw/openbw"]
+	path = openbw/openbw
+	url = https://github.com/OpenBW/openbw
+[submodule "openbw/bwapi"]
+	path = openbw/bwapi
+	url = https://github.com/OpenBW/bwapi
