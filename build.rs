@@ -79,8 +79,12 @@ fn main() {
     if !supported.contains(&&target[..]) {
         panic!("Only --target from {:?} is supported", supported);
     } else if target.contains("x86_64-unknown-linux-gnu") {
+
         // OpenBW/openbw and OpenBW/bwapi are added as the submodules, download them in case of absence
-        if !Path::new("openbw/bwapi/.git").exists() || !Path::new("openbw/openbw/.git").exists()  {
+        if  !Path::new("openbw/bwapi/.git").exists() ||
+            !Path::new("openbw/openbw/.git").exists() ||
+            !Path::new("bwapi-c/.git").exists() {
+            // download the sources of all the submodules
             let _ = Command::new("git").args(&["submodule", "update", "--init"])
                 .status();
         }
@@ -88,13 +92,23 @@ fn main() {
         let openbw_dir = format!("{}/openbw/openbw", cur_dir);
         log_var!(openbw_dir);
         let dst = Config::new("openbw/bwapi")
-            .define("OPENBW_DIR", openbw_dir)
+            .define("OPENBW_DIR", &openbw_dir)
             .define("OPENBW_ENABLE_UI", "1")
             .build();
         log_var!(dst);
-        download_bwapic_library("linux".to_owned(), &output_dir, bwapic_version, build_mode);
+        // previous variant: download_bwapic_library("linux".to_owned(), &output_dir, bwapic_version, build_mode);
+        let bwapic_dir = format!("{}/bwapi-c", cur_dir);
+        log_var!(bwapic_dir);
+        let dst = Config::new("bwapi-c")
+            .define("BWAPI_PATH", &openbw_dir)
+            .build();
+        log_var!(dst);
+
     } else if target.contains("i686-pc-windows-gnu") {
+
+        // for windows download bwapic library release
         download_bwapic_library("win32".to_owned(), &output_dir, bwapic_version, build_mode);
+
     }
     println!("cargo:rerun-if-changed={}", output_dir.display());
     println!("cargo:rustc-link-search=native={}", output_dir.join("lib").display());
