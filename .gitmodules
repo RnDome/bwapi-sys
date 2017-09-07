@@ -4,3 +4,6 @@
 [submodule "openbw/bwapi"]
 	path = openbw/bwapi
 	url = https://github.com/OpenBW/bwapi
+[submodule "bwapi-c"]
+	path = bwapi-c
+	url = https://github.com/RnDome/bwapi-c
