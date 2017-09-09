@@ -112,5 +112,10 @@ fn main() {
     }
     println!("cargo:rerun-if-changed={}", output_dir.display());
     println!("cargo:rustc-link-search=native={}", output_dir.join("lib").display());
-    println!("cargo:rustc-link-lib=static=BWAPIC");
+    println!("cargo:rustc-link-lib=dylib=BWAPIC");
+    // println!("cargo:rustc-link-lib=static=BWAPIC");
+    // to enable static linking enable it in BWAPIC in CMakeLists.txt
+    //    -add_library(BWAPIC SHARED ${BWAPIC_SRC})
+    //    +add_library(BWAPIC STATIC ${BWAPIC_SRC})
+    //    +set_property(TARGET BWAPIC PROPERTY POSITION_INDEPENDENT_CODE 1)
 }
