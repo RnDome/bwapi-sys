@@ -1,4 +1,4 @@
-bindgen bridge.h -o bridge.rs \
+bindgen bridge.h -o lib.rs \
   --no-unstable-rust \
   --opaque-type ".+_" \
   --blacklist-type "std.*|__.+|.+_$|Game_v(Send|Print|Draw).*|va_list|.+_t$" \
@@ -7,4 +7,4 @@ bindgen bridge.h -o bridge.rs \
   --raw-line "#![allow(improper_ctypes, non_snake_case)]" \
   -- -I../../bwapi-c/include
 
-sed -i -r -- 's/.+\s+(.+)_;/pub struct \1;/' bridge.rs
+sed -i -r -- 's/.+\s+(.+)_;/pub struct \1;/' lib.rs
