@@ -42,7 +42,7 @@ fn download(url: &str, into: &Path) {
 
 fn extract(archive_path: &Path, extract_to: &Path) {
     let file = File::open(archive_path).unwrap();
-    let unzipped = GzDecoder::new(file).unwrap();
+    let unzipped = GzDecoder::new(file);
     let mut archive = Archive::new(unzipped);
     archive.unpack(extract_to).unwrap();
 }
@@ -68,12 +68,14 @@ fn main() {
     let target = &get!("TARGET");
     let build_mode = &get!("PROFILE");
     let cur_dir = PathBuf::from(&get!("CARGO_MANIFEST_DIR"));
+    let submodules_dir = cur_dir.join("submodules");
     let bwapic_version = "1.0.0";
 
     log_var!(output_dir);
     log_var!(target);
     log_var!(build_mode);
     log_var!(cur_dir);
+    log_var!(submodules_dir);
 
     if target.contains("i686-pc-windows-gnu") {
         // for windows download bwapic library release
@@ -87,8 +89,8 @@ fn main() {
             .status();
 
         // OpenBW/bwapi is being built by cmake
-        let openbw_dir = cur_dir.join("openbw").join("openbw");
-        let bwapi_dir = cur_dir.join("openbw").join("bwapi");
+        let openbw_dir = submodules_dir.join("openbw").join("openbw");
+        let bwapi_dir = submodules_dir.join("openbw").join("bwapi");
         log_var!(openbw_dir);
         log_var!(bwapi_dir);
         let bwapi_build_dir = Config::new(&bwapi_dir)
@@ -98,9 +100,9 @@ fn main() {
         log_var!(bwapi_build_dir);
 
         // previous variant: download_bwapic_library("linux".to_owned(), &output_dir, bwapic_version, build_mode);
-        let bwapic_dir = cur_dir.join("bwapi-c");
+        let bwapic_dir = submodules_dir.join("bwapi-c");
         log_var!(bwapic_dir);
-        let bwapic_build_dir = Config::new("bwapi-c")
+        let bwapic_build_dir = Config::new(&bwapic_dir)
             .define("BWAPI_PATH", &openbw_dir)
             .build();
         log_var!(bwapic_build_dir);

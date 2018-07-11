@@ -4,6 +4,6 @@ bindgen BWAPI.h -o lib.rs \
   --no-layout-tests \
   --no-derive-debug \
   --raw-line "#![allow(improper_ctypes, non_snake_case)]" \
-  -- -I../bwapi-c/include
+  -- -I../submodules/bwapi-c/include
 
 sed -i -r -- 's/.+\s+(.+)_;/pub struct \1;/' lib.rs

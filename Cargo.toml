@@ -10,7 +10,7 @@ links = "BWAPIC"
 build = "build.rs"
 
 [build-dependencies]
-reqwest = "0.6"
-flate2 = "0.2"
+reqwest = "0.8"
+flate2 = "1"
 tar = "0.4"
-cmake = "0.1.24"
+cmake = "0.1.31"
