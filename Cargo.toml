@@ -1,6 +1,6 @@
 [package]
 name = "bwapi-sys"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Dmitry Kashitsyn <korvin@deeptown.org>", "Roman Proskuryakov <humbug@deeptown.org>"]
 keywords = ["starcraft", "broodwar", "api", "binding", "ffi"]
 repository = "https://github.com/RnDome/bwapi-sys"
