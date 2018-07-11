@@ -1,9 +1,9 @@
 [submodule "openbw/openbw"]
-	path = openbw/openbw
+	path = submodules/openbw/openbw
 	url = https://github.com/OpenBW/openbw
 [submodule "openbw/bwapi"]
-	path = openbw/bwapi
+	path = submodules/openbw/bwapi
 	url = https://github.com/OpenBW/bwapi
 [submodule "bwapi-c"]
-	path = bwapi-c
+	path = submodules/bwapi-c
 	url = https://github.com/RnDome/bwapi-c
