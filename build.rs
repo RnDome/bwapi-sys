@@ -31,7 +31,7 @@ fn download(url: &str, into: &Path) {
 
         if !response.status().is_success() {
             log!("Status: {}", response.status());
-            log!("Headers:\n{}", response.headers());
+            log!("Headers:\n{:?}", response.headers());
             panic!("Could not download file");
         }
 
