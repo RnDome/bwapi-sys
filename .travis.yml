@@ -1,0 +1,14 @@
+language: rust
+rust:
+  - stable
+addons:
+    apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-7 gcc-7
+before_install:
+        - export CC=$(which gcc-7)
+        - export CXX=$(which g++-7)
+sudo: false
+
